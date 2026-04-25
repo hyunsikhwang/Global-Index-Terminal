@@ -1,0 +1,6 @@
+{
+  "name": "Global Stock Index Performance",
+  "description": "A dashboard comparing global stock indices relative performance with a custom base date.",
+  "requestFramePermissions": [],
+  "majorCapabilities": []
+}
