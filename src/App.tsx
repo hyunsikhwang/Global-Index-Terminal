@@ -29,7 +29,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
           {label && format(parseISO(label), 'MMM dd, yyyy')}
         </p>
         <div className="space-y-2">
-          {payload.sort((a: any, b: any) => b.value - a.value).map((entry: any, index: number) => {
+          {payload.filter((entry: any) => entry.value !== null && entry.value !== undefined).sort((a: any, b: any) => b.value - a.value).map((entry: any, index: number) => {
             const perfValue = (entry.value as number) - 100;
             return (
               <div key={index} className="flex items-center justify-between gap-6">
@@ -232,12 +232,19 @@ export default function App() {
   const sortedStats = useMemo(() => {
     if (chartData.length === 0) return [];
     
-    // Use the last entry of chartData which contains normalized performances
-    const latestPerformance = chartData[chartData.length - 1];
-    
     const statsList = INDICES.map(idx => {
       const data = marketData.find(d => d.symbol === idx.id);
-      const perf = (latestPerformance[idx.id] as number) - 100 || 0;
+      
+      // Find the last valid performance value for this ticker to avoid weekend/holiday nulls yielding -100%
+      let lastVal: number | null = null;
+      for (let i = chartData.length - 1; i >= 0; i--) {
+        const val = chartData[i][idx.id];
+        if (val !== null && val !== undefined) {
+          lastVal = val;
+          break;
+        }
+      }
+      const perf = lastVal !== null ? lastVal - 100 : 0;
       
       return {
         id: idx.id,
